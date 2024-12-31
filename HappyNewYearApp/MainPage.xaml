@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:telegram="clr-namespace:HappyNewYearApp.Telegram"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:fluent="clr-namespace:FluentIcons.Maui;assembly=FluentIcons.Maui"
+             xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
+             x:Class="HappyNewYearApp.MainPage"
+             x:Name="_this">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter  x:Key="InvertedBoolConverter" />
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+
+        <VerticalStackLayout x:Name="LoginFieldsStack"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="25">
+
+            <Button x:Name="LoginButton"
+                    Text="Login"
+                    HorizontalOptions="Fill"
+                    MinimumWidthRequest="300"
+                    Clicked="LoginButtonClicked"/>
+
+        </VerticalStackLayout>
+
+        <VerticalStackLayout x:Name="VerificationFieldsStack"
+                             IsVisible="False"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="25">
+
+            <Label x:Name="VerificationInfoLabel"
+                   HorizontalOptions="Center"/>
+
+            <Entry x:Name="VerificationEntry"
+                   MinimumWidthRequest="300"
+                   Placeholder="Verification info"/>
+
+            <Button x:Name="VerificationButton"
+                    Text="Send Info"
+                    MinimumWidthRequest="300"
+                    Clicked="VerificationButtonClicked"/>
+
+        </VerticalStackLayout>
+        
+        <Grid RowDefinitions="auto, *"
+              IsVisible="False"
+              x:Name="DialogsGrid"
+              Padding="40, 20"
+              RowSpacing="20">
+
+            <HorizontalStackLayout Grid.Row="0"
+                                   HorizontalOptions="FillAndExpand"
+                                   Spacing="30">
+
+                <Label x:Name="UsersCountLabel"
+                       VerticalOptions="Center"/>
+
+                <Label x:Name="ChatsCountLabel"
+                       VerticalOptions="Center"/>
+
+                <SearchBar x:Name="DialogsSearchBar"
+                           MinimumWidthRequest="200"
+                           VerticalOptions="Center"
+                           SearchButtonPressed="DialogsSearchBarSearchButtonPressed"/>
+
+                <Picker x:Name="FilterPicker"
+                        VerticalOptions="Center"
+                        MinimumWidthRequest="100"
+                        SelectedIndexChanged="FilterPickerSelectedIndexChanged">
+                    <Picker.ItemsSource>
+                        <x:Array Type="{x:Type x:String}">
+                            <x:String>All</x:String>
+                            <x:String>Users</x:String>
+                            <x:String>Groups</x:String>
+                            <x:String>Selected</x:String>
+                            <x:String>Unselected</x:String>
+                        </x:Array>
+                    </Picker.ItemsSource>
+                </Picker>
+
+                <Button x:Name="SaveConfigButton"
+                        Text="Save Config"
+                        Clicked="SaveConfigButtonClicked"/>
+
+                <Button x:Name="RestoreConfigButton"
+                        Text="Restore Config"
+                        Clicked="RestoreConfigButtonClicked"/>
+
+                <Button Text="Clear selected"
+                        Clicked="ClearButtonClicked"/>
+
+                <Button Clicked="MessageButtonClicked"
+                        HorizontalOptions="EndAndExpand"
+                        Text="Send message"/>
+                
+            </HorizontalStackLayout>
+
+            <ListView x:Name="DialogsListView"
+                      Grid.Row="1"
+                      VerticalOptions="Fill"
+                      HorizontalOptions="Fill"
+                      CachingStrategy="RetainElement"
+                      BindingContext="{Binding ., Source=_this}">
+
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="telegram:Dialog">
+                        <ViewCell>
+                            <HorizontalStackLayout Spacing="15"
+                                                   VerticalOptions="Center">
+                                <CheckBox IsChecked="{Binding IsSelected}"/>
+
+                                <Grid IsVisible="{Binding IsUser}">
+                                    <fluent:SymbolIcon Symbol="Person"/>
+                                </Grid>
+
+                                <Grid IsVisible="{Binding IsUser, Converter={StaticResource InvertedBoolConverter}}">
+                                    <fluent:SymbolIcon Symbol="People"/>
+                                </Grid>
+
+                                <ffimageloading:CachedImage Source="{Binding ImageBytes, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                            WidthRequest="40"
+                                                            HeightRequest="40"
+                                                            CacheType="Memory"
+                                                            VerticalOptions="Center"/>
+
+                                <Label VerticalOptions="Center"
+                                       VerticalTextAlignment="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding PublicName}"/>
+                                            <Span Text="("/>
+                                            <Span Text="{Binding Username}"/>
+                                            <Span Text=")"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+
+                            </HorizontalStackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+
+            </ListView>
+        </Grid>
+
+        <ActivityIndicator x:Name="LoadingIndicator"
+                           IsVisible="False"
+                           IsRunning="True"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"/>
+
+    </Grid>
+
+</ContentPage>
+
